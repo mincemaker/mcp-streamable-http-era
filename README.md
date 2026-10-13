@@ -10,7 +10,7 @@
 >
 > 検証方法：振り分けの例は `examples/classify.mjs` を実行した出力を貼った。仕様の要件は、`sources/` に保存した原文から 1 文ずつ取り出して貼り、`checks.json` で照合した。
 
-この資料は、クライアントが 2026-07-28 以降と 2025-11-25 以前のどちらのプロトコルバージョンで話しているかは 1 本目の POST で決まり、診断で見る場所もそれで変わることを伝える。
+この資料は、クライアントが 2026-07-28 以降と 2025-11-25 以前のどちらのプロトコルバージョンで話しているかを 1 本目の POST から見分けられること、診断で見る場所もそれで変わることを伝える。
 modern ではヘッダーと本文の食い違い、legacy ではセッションとサーバー発のリクエストを見る。
 Dual-era のサーバーでは両方の経路が開いている。
 
@@ -68,12 +68,21 @@ modern の通信では、modern と共通の行を、2026-07-28 の MUST・SHOUL
 
 ## 1. 1 本の記録からプロトコルバージョンを判定する
 
-1 本目の POST が見えていれば、それで決まる。
+1 本目の POST が見えていれば、それで見分けられる。
 legacy のクライアントは initialize から始めなければならず、modern には initialize が無い。
 
 <!-- output: spec-init -->
 ```
 The initialization phase MUST be the first interaction between client and server.
+```
+
+ただし、1 本目の POST で以後のバージョンが固定されるわけではない。
+modern では各リクエストがバージョンを宣言し、サーバーはリクエストごとに受け入れるかを決める（[Versioning](https://modelcontextprotocol.io/specification/2026-07-28/basic/versioning)）。
+1 本目の POST は、サーバーが modern と legacy のどちらに対応するかを見分ける手がかりになる。
+
+<!-- output: spec-per-request -->
+```
+Every request carries its protocol version, and the server accepts or rejects each request independently:
 ```
 
 途中から見た記録では、`_meta` → `MCP-Session-Id` → `MCP-Protocol-Version` の順に手がかりを探す。
@@ -181,7 +190,7 @@ Clients SHOULD cache the result for the lifetime of the server process (stdio) o
 |---|---|---|---|
 | modern | modern 専用 | 動く | modern だけ。旧来の GET・DELETE が 405 になるかも見る |
 | modern | Dual-era | 動く | modern。加えて、legacy の経路が同じ認可で守られているか |
-| modern | legacy | 失敗する。応答を返さない、エラーを返す、legacy の意味で処理する、のどれもありうる | 2xx が返るなら、ヘッダーを検証しない後段がある |
+| modern | legacy | 失敗する。応答を返さない、エラーを返す、legacy の意味で処理する、のどれもありうる | JSON-RPC の result に `resultType` が無ければ、後段が legacy の意味で処理した可能性がある。ヘッダーを照合しているかは、4 節の食い違いの試験で別に確かめる |
 | Dual-era | legacy | initialize へ切り替えて動く | legacy。切り替えの条件は 2 節 |
 | legacy | modern 専用 | 必須ヘッダーが無く 400。上の版へ移る仕組みは無い | legacy の観点は対象外 |
 | legacy | Dual-era | 動く。サーバーはセッション単位で legacy の動きをする | legacy |
@@ -231,7 +240,7 @@ If the version is older or the header is absent, the intermediary SHOULD reject 
 |---|---|
 | `requestState` を書き換えて再送する。別の利用者の state、期限切れの state、別のリクエストの state を送る | 攻撃者が操作できる入力として扱う（MUST）。認可や処理に効くなら HMAC・AEAD で守り、検証に失敗した state を拒否する（MUST）。主体・有効期限・元のリクエストの照合は SHOULD。1 回限りの処理はサーバー側で保証する（MUST）。[MRTR](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr#server-requirements-basic-workflow) |
 | 旧来の GET・DELETE、`MCP-Session-Id`、`Last-Event-ID` を送る | GET・DELETE は 405、2 つのヘッダーは無視する（SHOULD、modern 専用サーバー）。[Earlier Streamable HTTP Revisions](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http#earlier-streamable-http-revisions) |
-| modern の POST に、`resultType` の無い 2xx が返るか | modern の結果は `resultType` を含む（MUST）。無い結果を、クライアントは旧版サーバーの `complete` として扱う（MUST）。modern の POST に `resultType` の無い 2xx が返るなら、後段が legacy の意味で処理している。[Result Responses](https://modelcontextprotocol.io/specification/2026-07-28/basic#result-responses) |
+| modern の POST への JSON-RPC の result に、`resultType` が無いか | modern の結果は `resultType` を含む（MUST）。無い結果を、クライアントは旧版サーバーの `complete` として扱う（MUST）。modern の POST への result に `resultType` が無いなら、後段が legacy の意味で処理した可能性がある。modern サーバーの実装の不備や、中継による書き換えでも同じ記録になるので、これだけでは決まらない。[Result Responses](https://modelcontextprotocol.io/specification/2026-07-28/basic#result-responses) |
 
 <!-- output: spec-mrtr -->
 ```
@@ -327,7 +336,7 @@ On receiving the authorization response, MCP clients MUST apply the validation i
 
 <details><summary>答え</summary>
 
-判定しない。仕様に従うクライアントでヘッダーを付けないのは 2025-03-26 だけなので、legacy の正規のリクエストと見るのが先になる。中継がヘッダーを落とした可能性もあるので、同じクライアントの initialize があればその `protocolVersion` で確かめる。1 節の E の記録がこの形。
+判定しない。仕様に従うクライアントでヘッダーを付けないのは 2025-03-26 だけだが、中継がヘッダーやメタデータを落とした場合や、仕様に従わない modern のクライアントでも同じ記録になる。この POST だけでバージョンを決めず、同じクライアントの initialize があればその `protocolVersion` と、中継の前後の記録で確かめる。1 節の E の記録がこの形。
 
 </details>
 
@@ -339,19 +348,19 @@ On receiving the authorization response, MCP clients MUST apply the validation i
 
 </details>
 
-3. Dual-era クライアントの前に、必須ヘッダーの欠落を独自の HTML の 400 で弾く WAF がある。何が起きうるか。
+3. Dual-era クライアントの前に、modern のリクエストを独自の HTML の 400 で拒否する WAF がある。何が起きうるか。
 
 <details><summary>答え</summary>
 
-本文に modern のエラーが無いので、クライアントは initialize へ切り替え、その判定をオリジン単位で保存しうる。以後の通信は legacy の経路を通る。2 節の H の記録と分岐の図。仕様からの推論で、実装での確認はしていない。
+本文に modern のエラーが無いので、クライアントは initialize へ切り替えうる。後段が legacy に対応していれば、その経路で通信が成り立つ。modern 専用なら initialize は通らない。クライアントがその判定をオリジン単位で保存すると、以後の通信にも影響しうる。2 節の H の記録と分岐の図。仕様からの推論で、実際の切り替えと保存の動きは、クライアントの実装ごとに確かめる必要がある。
 
 </details>
 
-4. modern の POST に 2xx が返り、結果に `resultType` が無かった。何を疑うか。
+4. modern の POST に JSON-RPC の result が返り、その中に `resultType` が無かった。何を疑うか。
 
 <details><summary>答え</summary>
 
-後段が legacy で、modern のリクエストを legacy の意味で処理した可能性。そのサーバーはヘッダーと本文を照合しないので、`Mcp-Name` で認可する中継があれば食い違いが通る（3 節と 4 節）。
+後段が legacy の意味で処理した可能性を疑う。ただ、これだけでは後段が legacy であることも、ヘッダーと本文を照合していないことも決まらない。modern サーバーの実装の不備や、中継による書き換えでも同じ記録になる。後段がどのバージョンとして受け取ったかを確かめ、`Mcp-Name` と本文の `name` を食い違わせたリクエストで、400 と `-32020` で拒否されるかを別に試す（3 節と 4 節）。
 
 </details>
 

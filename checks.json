@@ -199,6 +199,13 @@
       "expect": [
         "Renumber the error codes"
       ]
+    },
+    {
+      "name": "spec-per-request",
+      "cmd": "node examples/quote.mjs sources/2026-07-28-versioning.md 'Every request carries its protocol version'",
+      "expect": [
+        "Every request carries its protocol version"
+      ]
     }
   ]
 }
