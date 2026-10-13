@@ -369,6 +369,7 @@ mise exec -- node ~/.claude/skills/explainer/scripts/verify-doc.mjs .
 | `examples/captures.json` | 仕様の例をもとにした記録 9 本 |
 | `sources/` | 照合に使った仕様の原文（2026-10-13 取得） |
 | `figures/fallback.mmd` | 2 節の分岐の図。事実シートは `fallback.facts.json` |
+| `docs/index.html` | GitHub Pages で配信する HTML。`verify-doc.mjs` が作る `dist/index.html` を写したもの |
 
 出典は、[公式ブログ](https://blog.modelcontextprotocol.io/posts/2026-07-28/)、[gihyo.jp の記事](https://gihyo.jp/article/2026/07/mcp-spec-2026-07-28)、[Changelog](https://modelcontextprotocol.io/specification/2026-07-28/changelog)、本文中の仕様の各節。
 
