@@ -51,12 +51,16 @@ MAY の行は実装しだいなので、見当たらなくても legacy を否�
 
 診断で見る場所は、どちらのプロトコルバージョンかで次のように分かれる。
 
-| 経路 | 主な観点と要件の強さ | 対象になる条件 |
-|---|---|---|
-| modern | ヘッダーと本文の食い違いを拒否するか（MUST）、`Mcp-Name` の Base64 をデコードしてから比べるか（MUST）、中継が古い版のヘッダーを信頼しないか（SHOULD）、`requestState` の改ざんを拒否するか（認可や処理に効くなら MUST）、旧来の GET・DELETE に 405 を返すか（SHOULD） | サーバーが modern を話す |
-| legacy | Session ID が推測できないか（SHOULD）、終了後に 404 になるか（MUST）、`Last-Event-ID` で別のストリームを再送しないか（MUST NOT）、SSE 上の sampling を利用者が拒否できるか（SHOULD） | サーバーが initialize に応える |
-| 切り替え | Dual-era クライアントが 400 の本文を見てから legacy へ移るか（SHOULD）。両経路の認可が同じかは規範外の観点 | クライアントかサーバーが Dual-era |
-| 共通 | 不正な `Origin` に 403 を返すか（MUST）、認可レスポンスの `iss` を検証するか（2026-07-28 からクライアントの MUST） | どちらでも |
+| 経路 | 観点と仕様の要件 | 対象になる条件 | legacy の通信での扱い |
+|---|---|---|---|
+| modern | ヘッダーと本文の食い違いを拒否するか（MUST）、`Mcp-Name` の Base64 をデコードしてから比べるか（MUST）、中継が古い版のヘッダーを信頼しないか（SHOULD）、`requestState` の改ざんを拒否するか（認可や処理に効くなら MUST）、旧来の GET・DELETE に 405 を返すか（SHOULD） | サーバーが modern を話す | 該当しない。legacy の通信には、照合するヘッダーも `requestState` も無い |
+| legacy | Session ID が推測できないか（SHOULD）、終了後に 404 になるか（MUST）、`Last-Event-ID` で別のストリームを再送しないか（MUST NOT）、SSE 上の sampling を利用者が拒否できるか（SHOULD） | サーバーが initialize に応える | 2025-11-25 の MUST・SHOULD のとおりに指摘する |
+| 切り替え | Dual-era クライアントが 400 の本文を見てから legacy へ移るか（SHOULD）。両経路の認可が同じかは、仕様に要件の無い観点 | クライアントかサーバーが Dual-era | 切り替えた後の通信は、上の legacy の行で見る |
+| 共通 | 不正な `Origin` に 403 を返すか（MUST） | どちらでも | どちらの版でも MUST なので、そのまま指摘する |
+| 共通 | 認可レスポンスの `iss` を検証するか（2026-07-28 からクライアントの MUST） | どちらでも | 要件違反ではない。新しいバージョンでは MUST になるので、今のうちに対応しておくべき点として情報の扱いで伝える |
+
+modern の通信では、modern と共通の行を、2026-07-28 の MUST・SHOULD のとおりに指摘する。
+2026-07-28 で加わった MUST のうち、legacy の通信にも当てはめて伝えられるのは、この資料の範囲では `iss` の検証だけになる。
 
 ## 1. 1 本の記録からプロトコルバージョンを判定する
 
@@ -127,7 +131,22 @@ If the body contains a recognized modern JSON-RPC error, the server speaks a mod
 If the body is empty or is not a recognized modern JSON-RPC error, fall back to `initialize` and continue with the legacy version for subsequent requests.
 ```
 
-modern のエラーの主なものは、`-32020` HeaderMismatch、`-32021` MissingRequiredClientCapability、`-32022` UnsupportedProtocolVersion と、404 に付く `-32601` の 4 つ。
+Dual-era のクライアントが 400 で見分けるものとして、原文は `UnsupportedProtocolVersionError`、`MissingRequiredClientCapabilityError`、ヘッダーの照合の失敗の 3 つを挙げている。上の引用の 1 文目がそれに当たる。
+コードは Changelog が定めていて、`UnsupportedProtocolVersion` が `-32022`、`MissingRequiredClientCapability` が `-32021`、ヘッダーの照合の失敗に使う `HeaderMismatch` が `-32020`。
+
+<!-- output: spec-codes -->
+```
+Renumber the error codes introduced in this draft accordingly — `HeaderMismatch` `-32001` → `-32020`, `MissingRequiredClientCapability` `-32003` → `-32021`, `UnsupportedProtocolVersion` `-32004` → `-32022` — and add `HeaderMismatchError` to the schema, which previously existed only in transport prose.
+```
+
+メソッドを実装していないサーバーは、404 と `-32601` を返す（[Protocol Version Header](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http#protocol-version-header)）。
+「modern のエラー」の一覧は原文に無いので、これで全部とは限らない。
+
+<!-- output: spec-404 -->
+```
+If the server does not implement the requested RPC method, it **MUST** respond with `404 Not Found` and a JSON-RPC error with code `-32601` (`Method not found`).
+```
+
 G は modern のエラーが返った記録で、クライアントは legacy へ移らない。
 H のように WAF やゲートウェイが自前の 400 ページを返すと、本文に modern のエラーが無いので、クライアントは legacy へ切り替える。
 
@@ -274,7 +293,7 @@ Authorization servers **SHOULD** include the `iss` parameter in authorization re
 ```
 
 2025-11-25 の Authorization には `iss` も RFC 9207 も出てこないので、legacy のクライアントが検証するとは限らない。
-指摘の重さは、通信がどちらのプロトコルバージョンかで変わる。modern で話すクライアントが検証しないなら、MUST の実装漏れになる。legacy で話すクライアントなら要件違反ではないが、新しいバージョンでは MUST になるので、今のうちに対応しておくべき点として情報の扱いで伝えられる。
+同じ不備でも、通信がどちらのプロトコルバージョンかで、指摘の種類が変わる。modern で話すクライアントが検証しないなら、MUST の実装漏れになる。legacy で話すクライアントなら要件違反ではないが、新しいバージョンでは MUST になるので、今のうちに対応しておくべき点として情報の扱いで伝えられる。
 メタデータが `authorization_response_iss_parameter_supported` を `true` にしているのに `iss` が無い応答は、拒否する。
 
 <!-- output: spec-iss -->
@@ -348,3 +367,5 @@ mise exec -- node ~/.claude/skills/explainer/scripts/verify-doc.mjs .
 | `figures/fallback.mmd` | 2 節の分岐の図。事実シートは `fallback.facts.json` |
 
 出典は、[公式ブログ](https://blog.modelcontextprotocol.io/posts/2026-07-28/)、[gihyo.jp の記事](https://gihyo.jp/article/2026/07/mcp-spec-2026-07-28)、[Changelog](https://modelcontextprotocol.io/specification/2026-07-28/changelog)、本文中の仕様の各節。
+
+<style>pre { white-space: pre-wrap; overflow-wrap: anywhere; }</style>

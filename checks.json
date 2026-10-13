@@ -185,6 +185,20 @@
       "expect": [
         "0"
       ]
+    },
+    {
+      "name": "spec-404",
+      "cmd": "node examples/quote.mjs sources/2026-07-28-streamable-http.md 'If the server does not implement the requested RPC method'",
+      "expect": [
+        "If the server does not implement the requested RPC method"
+      ]
+    },
+    {
+      "name": "spec-codes",
+      "cmd": "node examples/quote.mjs sources/2026-07-28-changelog.md 'Renumber the error codes'",
+      "expect": [
+        "Renumber the error codes"
+      ]
     }
   ]
 }
