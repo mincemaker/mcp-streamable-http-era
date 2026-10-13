@@ -18,9 +18,9 @@ modern・legacy・Dual-era は仕様の呼び名で、2026-07-28 の [Terminolog
 
 <!-- output: spec-terms -->
 ```
-**Modern**: protocol versions that convey version, identity, and capabilities as per-request metadata (revision `2026-07-28` and later).
-**Legacy**: protocol versions that establish a session with an `initialize` handshake (`2025-11-25` and earlier).
-**Dual-era**: an implementation that supports both modern and legacy versions.
+Modern: protocol versions that convey version, identity, and capabilities as per-request metadata (revision 2026-07-28 and later).
+Legacy: protocol versions that establish a session with an initialize handshake (2025-11-25 and earlier).
+Dual-era: an implementation that supports both modern and legacy versions.
 ```
 
 <details><summary>節ごとの役割</summary>
@@ -73,7 +73,7 @@ legacy のクライアントは initialize から始めなければならず、m
 
 <!-- output: spec-init -->
 ```
-The initialization phase **MUST** be the first interaction between client and server.
+The initialization phase MUST be the first interaction between client and server.
 ```
 
 途中から見た記録では、`_meta` → `MCP-Session-Id` → `MCP-Protocol-Version` の順に手がかりを探す。
@@ -100,12 +100,12 @@ E のようにヘッダーが無い POST は、クライアント側の要件か
 
 <!-- output: spec-version-header -->
 ```
-Every POST request to the MCP endpoint **MUST** include an `MCP-Protocol-Version` header.
+Every POST request to the MCP endpoint MUST include an MCP-Protocol-Version header.
 ```
 
 <!-- output: spec-legacy-header -->
 ```
-If using HTTP, the client **MUST** include the `MCP-Protocol-Version: <protocol-version>` HTTP header on all subsequent requests to the MCP server, allowing the MCP server to respond based on the MCP protocol version.
+If using HTTP, the client MUST include the MCP-Protocol-Version: <protocol-version> HTTP header on all subsequent requests to the MCP server, allowing the MCP server to respond based on the MCP protocol version.
 ```
 
 仕様に従うクライアントでヘッダーを付けないのは、ヘッダーが定義される前の 2025-03-26 だけになる。
@@ -116,7 +116,7 @@ If using HTTP, the client **MUST** include the `MCP-Protocol-Version: <protocol-
 
 <!-- output: spec-version-header -->
 ```
-A server that supports clients implementing protocol versions earlier than `2025-06-18` (which did not define the `MCP-Protocol-Version` header) **MAY** treat a request that omits the header as protocol version `2025-03-26`.
+A server that supports clients implementing protocol versions earlier than 2025-06-18 (which did not define the MCP-Protocol-Version header) MAY treat a request that omits the header as protocol version 2025-03-26.
 ```
 
 自分の記録を振り分けるときは、同じ形の JSON にして `node examples/classify.mjs <file>` を実行する。
@@ -130,9 +130,9 @@ Dual-era のクライアントは、まず modern の POST を送る。
 
 <!-- output: spec-fallback -->
 ```
-On `400 Bad Request`, the client **SHOULD** inspect the response body before falling back: modern servers also use `400` for [`UnsupportedProtocolVersionError`][unsupported-version], `MissingRequiredClientCapabilityError`, and header-validation failures.
-If the body contains a recognized modern JSON-RPC error, the server speaks a modern version of MCP — retry using the advertised `supported` versions or correct the request, rather than falling back.
-If the body is empty or is not a recognized modern JSON-RPC error, fall back to `initialize` and continue with the legacy version for subsequent requests.
+On 400 Bad Request, the client SHOULD inspect the response body before falling back: modern servers also use 400 for UnsupportedProtocolVersionError, MissingRequiredClientCapabilityError, and header-validation failures.
+If the body contains a recognized modern JSON-RPC error, the server speaks a modern version of MCP — retry using the advertised supported versions or correct the request, rather than falling back.
+If the body is empty or is not a recognized modern JSON-RPC error, fall back to initialize and continue with the legacy version for subsequent requests.
 ```
 
 Dual-era のクライアントが 400 で見分けるものとして、原文は `UnsupportedProtocolVersionError`、`MissingRequiredClientCapabilityError`、ヘッダーの照合の失敗の 3 つを挙げている。上の引用の 1 文目がそれに当たる。
@@ -140,7 +140,7 @@ Dual-era のクライアントが 400 で見分けるものとして、原文は
 
 <!-- output: spec-codes -->
 ```
-Renumber the error codes introduced in this draft accordingly — `HeaderMismatch` `-32001` → `-32020`, `MissingRequiredClientCapability` `-32003` → `-32021`, `UnsupportedProtocolVersion` `-32004` → `-32022` — and add `HeaderMismatchError` to the schema, which previously existed only in transport prose.
+Renumber the error codes introduced in this draft accordingly — HeaderMismatch -32001 → -32020, MissingRequiredClientCapability -32003 → -32021, UnsupportedProtocolVersion -32004 → -32022 — and add HeaderMismatchError to the schema, which previously existed only in transport prose.
 ```
 
 メソッドを実装していないサーバーは、404 と `-32601` を返す（[Protocol Version Header](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http#protocol-version-header)）。
@@ -148,7 +148,7 @@ Renumber the error codes introduced in this draft accordingly — `HeaderMismatc
 
 <!-- output: spec-404 -->
 ```
-If the server does not implement the requested RPC method, it **MUST** respond with `404 Not Found` and a JSON-RPC error with code `-32601` (`Method not found`).
+If the server does not implement the requested RPC method, it MUST respond with 404 Not Found and a JSON-RPC error with code -32601 (Method not found).
 ```
 
 G は modern のエラーが返った記録で、クライアントは legacy へ移らない。
@@ -166,7 +166,7 @@ H 中継が本文を差し替えた 400: modern — _meta に io.modelcontextpro
 
 <!-- output: spec-cache -->
 ```
-Clients **SHOULD** cache the result for the lifetime of the server process (stdio) or origin (HTTP), and **MAY** persist it across restarts of the same server configuration, re-probing if the cached assumption later fails.
+Clients SHOULD cache the result for the lifetime of the server process (stdio) or origin (HTTP), and MAY persist it across restarts of the same server configuration, re-probing if the cached assumption later fails.
 ```
 
 判定を保存するクライアントなら、中継が 1 回本文を差し替えただけで、以後の通信が legacy の経路に移りうる。
@@ -197,7 +197,7 @@ modern 専用サーバーに legacy の観点を当てても、何も出ない�
 
 <!-- output: spec-validation -->
 ```
-Servers that process the request body **MUST** reject requests where the values specified in the headers do not match the corresponding values in the request body.
+Servers that process the request body MUST reject requests where the values specified in the headers do not match the corresponding values in the request body.
 ```
 
 <!-- output: classify -->
@@ -213,7 +213,7 @@ I ヘッダーと本文が食い違う modern: modern — _meta に io.modelcont
 
 <!-- output: spec-validation -->
 ```
-In particular, servers **MUST** decode an encoded `Mcp-Name` or `Mcp-Param-{Name}` value before comparing it to the corresponding request body value during [Server Validation](#server-validation).
+In particular, servers MUST decode an encoded Mcp-Name or Mcp-Param-{Name} value before comparing it to the corresponding request body value during Server Validation.
 ```
 
 ヘッダーで制御する中継は、`MCP-Protocol-Version` が古いか無いリクエストを拒否する（SHOULD）。
@@ -221,8 +221,8 @@ In particular, servers **MUST** decode an encoded `Mcp-Name` or `Mcp-Param-{Name
 
 <!-- output: spec-intermediary -->
 ```
-Intermediaries that enforce policy based on mirrored headers (e.g., routing or rate-limiting by tenant) **SHOULD** verify that the `MCP-Protocol-Version` header indicates a version that requires header–body validation.
-If the version is older or the header is absent, the intermediary **SHOULD** reject the request rather than trusting unvalidated header values.
+Intermediaries that enforce policy based on mirrored headers (e.g., routing or rate-limiting by tenant) SHOULD verify that the MCP-Protocol-Version header indicates a version that requires header–body validation.
+If the version is older or the header is absent, the intermediary SHOULD reject the request rather than trusting unvalidated header values.
 ```
 
 ほかの観点は次の 3 つ。
@@ -235,15 +235,15 @@ If the version is older or the header is absent, the intermediary **SHOULD** rej
 
 <!-- output: spec-mrtr -->
 ```
-If a client request contains a `requestState` field, servers **MUST** treat `requestState` as an attacker-controlled input.
-If `requestState` influences authorization, resource access, or business logic, servers **MUST** protect its integrity (e.g. HMAC or AEAD) and **MUST** reject state that fails verification.
-Servers for which a given `requestState` must be consumed at most once (e.g., one-time redemptions) **MUST** enforce that invariant server-side.
+If a client request contains a requestState field, servers MUST treat requestState as an attacker-controlled input.
+If requestState influences authorization, resource access, or business logic, servers MUST protect its integrity (e.g. HMAC or AEAD) and MUST reject state that fails verification.
+Servers for which a given requestState must be consumed at most once (e.g., one-time redemptions) MUST enforce that invariant server-side.
 ```
 
 <!-- output: spec-resulttype -->
 ```
-The `result` **MUST** include a `resultType` field to indicate the type of the result.
-For backward compatibility with servers implementing earlier protocol versions, which do not include `resultType`, clients **MUST** treat an absent `resultType` as `"complete"`.
+The result MUST include a resultType field to indicate the type of the result.
+For backward compatibility with servers implementing earlier protocol versions, which do not include resultType, clients MUST treat an absent resultType as "complete".
 ```
 
 ## 5. legacy 経路の診断観点
@@ -253,9 +253,9 @@ Dual-era サーバーが initialize に応える限り、2025-11-25 までの攻
 
 <!-- output: spec-session -->
 ```
-The session ID **SHOULD** be globally unique and cryptographically secure (e.g., a securely generated UUID, a JWT, or a cryptographic hash).
-The server **MAY** terminate the session at any time, after which it **MUST** respond to requests containing that session ID with HTTP 404 Not Found.
-The server **MUST NOT** replay messages that would have been delivered on a different stream.
+The session ID SHOULD be globally unique and cryptographically secure (e.g., a securely generated UUID, a JWT, or a cryptographic hash).
+The server MAY terminate the session at any time, after which it MUST respond to requests containing that session ID with HTTP 404 Not Found.
+The server MUST NOT replay messages that would have been delivered on a different stream.
 ```
 
 | 観点 | 対象になる条件 |
@@ -267,7 +267,7 @@ The server **MUST NOT** replay messages that would have been delivered on a diff
 
 <!-- output: spec-sampling -->
 ```
-For trust & safety and security, there **SHOULD** always be a human in the loop with the ability to deny sampling requests.
+For trust & safety and security, there SHOULD always be a human in the loop with the ability to deny sampling requests.
 ```
 
 Session ID が返らないサーバーでは、セッションの観点は対象外になる。
@@ -277,7 +277,7 @@ Roots・Sampling・Logging は 2026-07-28 で非推奨になったが、非推�
 <!-- output: spec-deprecation -->
 ```
 These features remain fully functional during the deprecation window but new implementations should not add support for them.
-Adopt a specification [feature lifecycle and deprecation policy](/community/feature-lifecycle) defining the Active, Deprecated, and Removed feature states, a minimum twelve-month deprecation window, and a [registry of deprecated features](/specification/2026-07-28/deprecated) ([SEP-2596](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2596)).
+Adopt a specification feature lifecycle and deprecation policy defining the Active, Deprecated, and Removed feature states, a minimum twelve-month deprecation window, and a registry of deprecated features (SEP-2596).
 ```
 
 `Origin` の検証はどちらのプロトコルバージョンでも同じ。
@@ -285,7 +285,7 @@ Adopt a specification [feature lifecycle and deprecation policy](/community/feat
 
 <!-- output: spec-origin -->
 ```
-If the `Origin` header is present and invalid, servers **MUST** respond with HTTP 403 Forbidden.
+If the Origin header is present and invalid, servers MUST respond with HTTP 403 Forbidden.
 ```
 
 認可レスポンスの `iss` の検証は、2026-07-28 で加わったクライアントの要件。
@@ -293,7 +293,7 @@ If the `Origin` header is present and invalid, servers **MUST** respond with HTT
 
 <!-- output: spec-iss-changelog -->
 ```
-Authorization servers **SHOULD** include the `iss` parameter in authorization responses per [RFC 9207](https://datatracker.ietf.org/doc/html/rfc9207), and MCP clients **MUST** validate a present `iss` against the recorded issuer before redeeming the authorization code ([SEP-2468](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2468)).
+Authorization servers SHOULD include the iss parameter in authorization responses per RFC 9207, and MCP clients MUST validate a present iss against the recorded issuer before redeeming the authorization code (SEP-2468).
 ```
 
 2025-11-25 の Authorization には `iss` も RFC 9207 も出てこないので、legacy のクライアントが検証するとは限らない。
@@ -302,7 +302,7 @@ Authorization servers **SHOULD** include the `iss` parameter in authorization re
 
 <!-- output: spec-iss -->
 ```
-On receiving the authorization response, MCP clients **MUST** apply the validation in [RFC9207 Section 2.4](https://datatracker.ietf.org/doc/html/rfc9207#section-2.4) before transmitting the authorization code to any token endpoint:
+On receiving the authorization response, MCP clients MUST apply the validation in RFC9207 Section 2.4 before transmitting the authorization code to any token endpoint:
 ```
 
 ## 6. チェックリスト
@@ -365,7 +365,7 @@ mise exec -- node ~/.claude/skills/explainer/scripts/verify-doc.mjs .
 | ファイル | 内容 |
 |---|---|
 | `examples/classify.mjs` | 記録を modern と legacy に振り分け、modern の食い違いと Dual-era の分岐を出す |
-| `examples/quote.mjs` | `sources/` の原文から、指定した書き出しの 1 文を取り出す。本文の原文の引用はこれの出力 |
+| `examples/quote.mjs` | `sources/` の原文から、指定した書き出しの 1 文を取り出し、Markdown の記号を外して出す。本文の原文の引用はこれの出力 |
 | `examples/captures.json` | 仕様の例をもとにした記録 9 本 |
 | `sources/` | 照合に使った仕様の原文（2026-10-13 取得） |
 | `figures/fallback.mmd` | 2 節の分岐の図。事実シートは `fallback.facts.json` |

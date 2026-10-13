@@ -17,16 +17,16 @@
       "name": "spec-terms",
       "cmd": "node examples/quote.mjs sources/2026-07-28-versioning.md '**Modern**' '**Legacy**' '**Dual-era**'",
       "expect": [
-        "**Modern**",
-        "**Legacy**",
-        "**Dual-era**"
+        "Modern",
+        "Legacy",
+        "Dual-era"
       ]
     },
     {
       "name": "spec-init",
       "cmd": "node examples/quote.mjs sources/2025-11-25-lifecycle.md 'The initialization phase **MUST**'",
       "expect": [
-        "The initialization phase **MUST**"
+        "The initialization phase MUST"
       ]
     },
     {
@@ -35,7 +35,7 @@
       "expect": [
         "Every POST request to the MCP endpoint",
         "A server that supports clients implementing",
-        "These headers are **REQUIRED**"
+        "These headers are REQUIRED"
       ]
     },
     {
@@ -49,7 +49,7 @@
       "name": "spec-fallback",
       "cmd": "node examples/quote.mjs sources/2026-07-28-streamable-http.md 'On `400 Bad Request`, the client' 'If the body contains a recognized' 'If the body is empty'",
       "expect": [
-        "On `400 Bad Request`, the client",
+        "On 400 Bad Request, the client",
         "If the body contains a recognized",
         "If the body is empty"
       ]
@@ -58,15 +58,15 @@
       "name": "spec-cache",
       "cmd": "node examples/quote.mjs sources/2026-07-28-versioning.md 'Clients **SHOULD** cache the result'",
       "expect": [
-        "Clients **SHOULD** cache the result"
+        "Clients SHOULD cache the result"
       ]
     },
     {
       "name": "spec-validation",
       "cmd": "node examples/quote.mjs sources/2026-07-28-streamable-http.md 'Servers that process the request body **MUST** reject' 'In particular, servers **MUST** decode'",
       "expect": [
-        "Servers that process the request body **MUST** reject",
-        "In particular, servers **MUST** decode"
+        "Servers that process the request body MUST reject",
+        "In particular, servers MUST decode"
       ]
     },
     {
@@ -81,8 +81,8 @@
       "name": "spec-mrtr",
       "cmd": "node examples/quote.mjs sources/2026-07-28-mrtr.md 'If a client request contains a `requestState`' 'If `requestState` influences' 'Servers for which a given'",
       "expect": [
-        "If a client request contains a `requestState`",
-        "If `requestState` influences",
+        "If a client request contains a requestState",
+        "If requestState influences",
         "Servers for which a given"
       ]
     },
@@ -91,14 +91,14 @@
       "cmd": "node examples/quote.mjs sources/2026-07-28-streamable-http.md 'HTTP GET or DELETE' 'An `Mcp-Session-Id` header on a request'",
       "expect": [
         "HTTP GET or DELETE",
-        "An `Mcp-Session-Id` header on a request"
+        "An Mcp-Session-Id header on a request"
       ]
     },
     {
       "name": "spec-resulttype",
       "cmd": "node examples/quote.mjs sources/2026-07-28-basic.md 'The `result` **MUST** include a `resultType`' 'For backward compatibility with servers implementing earlier'",
       "expect": [
-        "The `result` **MUST** include a `resultType`",
+        "The result MUST include a resultType",
         "For backward compatibility with servers implementing earlier"
       ]
     },
@@ -106,11 +106,11 @@
       "name": "spec-session",
       "cmd": "node examples/quote.mjs sources/2025-11-25-transports.md 'The session ID **SHOULD**' 'The server **MAY** terminate the session' 'The server **MUST NOT** replay' 'A server using the Streamable HTTP transport **MAY** assign' 'If an `MCP-Session-Id` is returned'",
       "expect": [
-        "The session ID **SHOULD**",
-        "The server **MAY** terminate the session",
-        "The server **MUST NOT** replay",
-        "A server using the Streamable HTTP transport **MAY** assign",
-        "If an `MCP-Session-Id` is returned"
+        "The session ID SHOULD",
+        "The server MAY terminate the session",
+        "The server MUST NOT replay",
+        "A server using the Streamable HTTP transport MAY assign",
+        "If an MCP-Session-Id is returned"
       ]
     },
     {
@@ -124,30 +124,30 @@
       "name": "spec-origin",
       "cmd": "node examples/quote.mjs sources/2026-07-28-streamable-http.md 'If the `Origin` header is present and invalid'",
       "expect": [
-        "If the `Origin` header is present and invalid"
+        "If the Origin header is present and invalid"
       ]
     },
     {
       "name": "spec-meta",
       "cmd": "node examples/quote.mjs sources/2026-07-28-mrtr.md 'Every request **MUST** include' 'Servers **MUST** send server-to-client'",
       "expect": [
-        "Every request **MUST** include",
-        "Servers **MUST** send server-to-client"
+        "Every request MUST include",
+        "Servers MUST send server-to-client"
       ]
     },
     {
       "name": "spec-legacy-get",
       "cmd": "node examples/quote.mjs sources/2025-11-25-transports.md 'The client **MAY** issue an HTTP GET' 'The server **MAY** send JSON-RPC *requests* and *notifications* on the stream'",
       "expect": [
-        "The client **MAY** issue an HTTP GET",
-        "The server **MAY** send JSON-RPC *requests* and *notifications* on the stream"
+        "The client MAY issue an HTTP GET",
+        "The server MAY send JSON-RPC *requests* and *notifications* on the stream"
       ]
     },
     {
       "name": "spec-iss-changelog",
       "cmd": "node examples/quote.mjs sources/2026-07-28-changelog.md 'Authorization servers **SHOULD** include the `iss`'",
       "expect": [
-        "Authorization servers **SHOULD** include the `iss`"
+        "Authorization servers SHOULD include the iss"
       ]
     },
     {
@@ -169,14 +169,14 @@
       "name": "spec-token-legacy",
       "cmd": "node examples/quote.mjs sources/2025-11-25-authorization.md 'Note that authorization **MUST**'",
       "expect": [
-        "Note that authorization **MUST** be included in every HTTP request"
+        "Note that authorization MUST be included in every HTTP request"
       ]
     },
     {
       "name": "spec-token-modern",
       "cmd": "node examples/quote.mjs sources/2026-07-28-authorization.md 'Note that authorization **MUST**'",
       "expect": [
-        "Note that authorization **MUST** be included in every HTTP request"
+        "Note that authorization MUST be included in every HTTP request"
       ]
     },
     {
