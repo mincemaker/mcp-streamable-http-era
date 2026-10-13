@@ -1,0 +1,6 @@
+{
+  "source": "sources/2026-07-28-streamable-http.md の Backward Compatibility 節",
+  "labels": ["modern の POST", "modern で続ける", "modern のエラーか", "supported の版で再送", "initialize へフォールバック", "endpoint"],
+  "forbidden": ["Mcp-Session-Id を付けて"],
+  "edges": ["req->ok", "req->err", "err->retry", "err->init", "init->sse"]
+}

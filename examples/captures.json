@@ -1,0 +1,73 @@
+[
+  {
+    "label": "A modern の tools/call",
+    "request": {
+      "method": "POST",
+      "headers": { "MCP-Protocol-Version": "2026-07-28", "Mcp-Method": "tools/call", "Mcp-Name": "get_weather" },
+      "body": { "jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": { "name": "get_weather", "arguments": { "location": "Seattle, WA" },
+        "_meta": { "io.modelcontextprotocol/protocolVersion": "2026-07-28", "io.modelcontextprotocol/clientInfo": { "name": "ExampleClient", "version": "1.0.0" }, "io.modelcontextprotocol/clientCapabilities": {} } } }
+    },
+    "response": { "status": 200, "body": { "jsonrpc": "2.0", "id": 1, "result": { "resultType": "complete", "content": [] } } }
+  },
+  {
+    "label": "B legacy の initialize",
+    "request": {
+      "method": "POST",
+      "headers": {},
+      "body": { "jsonrpc": "2.0", "id": 1, "method": "initialize", "params": { "protocolVersion": "2025-11-25", "capabilities": {}, "clientInfo": { "name": "OldClient", "version": "1.0.0" } } }
+    }
+  },
+  {
+    "label": "C legacy の途中（セッションあり）",
+    "request": {
+      "method": "POST",
+      "headers": { "MCP-Protocol-Version": "2025-11-25", "MCP-Session-Id": "1868a90c" },
+      "body": { "jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": { "name": "get_weather", "arguments": {} } }
+    },
+    "response": { "status": 200, "body": { "jsonrpc": "2.0", "id": 2, "result": { "content": [] } } }
+  },
+  {
+    "label": "D legacy の途中（セッションなし）",
+    "request": {
+      "method": "POST",
+      "headers": { "MCP-Protocol-Version": "2025-06-18" },
+      "body": { "jsonrpc": "2.0", "id": 3, "method": "tools/list", "params": {} }
+    }
+  },
+  {
+    "label": "E 2025-03-26 の途中",
+    "request": { "method": "POST", "headers": {}, "body": { "jsonrpc": "2.0", "id": 4, "method": "tools/list", "params": {} } }
+  },
+  {
+    "label": "F GET の待ち受け",
+    "request": { "method": "GET", "headers": { "Accept": "text/event-stream", "MCP-Session-Id": "1868a90c" } }
+  },
+  {
+    "label": "G 版が合わない modern",
+    "request": {
+      "method": "POST",
+      "headers": { "MCP-Protocol-Version": "2026-07-28", "Mcp-Method": "tools/list" },
+      "body": { "jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": { "_meta": { "io.modelcontextprotocol/protocolVersion": "2026-07-28", "io.modelcontextprotocol/clientCapabilities": {} } } }
+    },
+    "response": { "status": 400, "body": { "jsonrpc": "2.0", "id": 1, "error": { "code": -32022, "message": "Unsupported protocol version", "data": { "supported": ["2026-09-01"], "requested": "2026-07-28" } } } }
+  },
+  {
+    "label": "H 中継が本文を差し替えた 400",
+    "request": {
+      "method": "POST",
+      "headers": { "MCP-Protocol-Version": "2026-07-28", "Mcp-Method": "tools/list" },
+      "body": { "jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": { "_meta": { "io.modelcontextprotocol/protocolVersion": "2026-07-28", "io.modelcontextprotocol/clientCapabilities": {} } } }
+    },
+    "response": { "status": 400, "body": "<html>Request blocked</html>" }
+  },
+  {
+    "label": "I ヘッダーと本文が食い違う modern",
+    "request": {
+      "method": "POST",
+      "headers": { "MCP-Protocol-Version": "2026-07-28", "Mcp-Method": "tools/call", "Mcp-Name": "=?base64?cmVhZF9vbmx5?=" },
+      "body": { "jsonrpc": "2.0", "id": 5, "method": "tools/call", "params": { "name": "delete_all", "arguments": {},
+        "_meta": { "io.modelcontextprotocol/protocolVersion": "2026-07-28", "io.modelcontextprotocol/clientCapabilities": {} } } }
+    },
+    "response": { "status": 400, "body": { "jsonrpc": "2.0", "id": 5, "error": { "code": -32020, "message": "Header mismatch" } } }
+  }
+]

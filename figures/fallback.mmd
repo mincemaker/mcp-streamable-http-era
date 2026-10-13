@@ -1,0 +1,17 @@
+---
+config:
+  flowchart:
+    wrappingWidth: 480
+---
+flowchart TD
+  req["modern の POST<br/>_meta・MCP-Protocol-Version・Mcp-Method"]
+  ok("2xx<br/>modern で続ける")
+  err{"4xx の本文は<br/>modern のエラーか"}
+  retry("-32022 なら supported の版で再送<br/>-32020 ならヘッダーを直す")
+  init("initialize へフォールバック<br/>legacy で続ける")
+  sse("さらに失敗したら GET で<br/>endpoint イベントを待つ（HTTP+SSE）")
+  req -->|2xx| ok
+  req -->|4xx| err
+  err -->|はい| retry
+  err -->|いいえ・空| init
+  init -->|400 / 404 / 405| sse

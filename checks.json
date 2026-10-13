@@ -1,0 +1,190 @@
+{
+  "checks": [
+    {
+      "name": "classify",
+      "cmd": "node examples/classify.mjs examples/captures.json",
+      "expect": [
+        "A modern の tools/call: modern",
+        "B legacy の initialize: legacy",
+        "E 2025-03-26 の途中: legacy",
+        "G 版が合わない modern: modern",
+        "H 中継が本文を差し替えた 400: modern",
+        "initialize へフォールバック",
+        "不一致: mcp-name"
+      ]
+    },
+    {
+      "name": "spec-terms",
+      "cmd": "node examples/quote.mjs sources/2026-07-28-versioning.md '**Modern**' '**Legacy**' '**Dual-era**'",
+      "expect": [
+        "**Modern**",
+        "**Legacy**",
+        "**Dual-era**"
+      ]
+    },
+    {
+      "name": "spec-init",
+      "cmd": "node examples/quote.mjs sources/2025-11-25-lifecycle.md 'The initialization phase **MUST**'",
+      "expect": [
+        "The initialization phase **MUST**"
+      ]
+    },
+    {
+      "name": "spec-version-header",
+      "cmd": "node examples/quote.mjs sources/2026-07-28-streamable-http.md 'Every POST request to the MCP endpoint' 'A server that supports clients implementing' 'These headers are **REQUIRED**'",
+      "expect": [
+        "Every POST request to the MCP endpoint",
+        "A server that supports clients implementing",
+        "These headers are **REQUIRED**"
+      ]
+    },
+    {
+      "name": "spec-legacy-header",
+      "cmd": "node examples/quote.mjs sources/2025-11-25-transports.md 'If using HTTP, the client'",
+      "expect": [
+        "If using HTTP, the client"
+      ]
+    },
+    {
+      "name": "spec-fallback",
+      "cmd": "node examples/quote.mjs sources/2026-07-28-streamable-http.md 'On `400 Bad Request`, the client' 'If the body contains a recognized' 'If the body is empty'",
+      "expect": [
+        "On `400 Bad Request`, the client",
+        "If the body contains a recognized",
+        "If the body is empty"
+      ]
+    },
+    {
+      "name": "spec-cache",
+      "cmd": "node examples/quote.mjs sources/2026-07-28-versioning.md 'Clients **SHOULD** cache the result'",
+      "expect": [
+        "Clients **SHOULD** cache the result"
+      ]
+    },
+    {
+      "name": "spec-validation",
+      "cmd": "node examples/quote.mjs sources/2026-07-28-streamable-http.md 'Servers that process the request body **MUST** reject' 'In particular, servers **MUST** decode'",
+      "expect": [
+        "Servers that process the request body **MUST** reject",
+        "In particular, servers **MUST** decode"
+      ]
+    },
+    {
+      "name": "spec-intermediary",
+      "cmd": "node examples/quote.mjs sources/2026-07-28-streamable-http.md 'Intermediaries that enforce policy' 'If the version is older'",
+      "expect": [
+        "Intermediaries that enforce policy",
+        "If the version is older"
+      ]
+    },
+    {
+      "name": "spec-mrtr",
+      "cmd": "node examples/quote.mjs sources/2026-07-28-mrtr.md 'If a client request contains a `requestState`' 'If `requestState` influences' 'Servers for which a given'",
+      "expect": [
+        "If a client request contains a `requestState`",
+        "If `requestState` influences",
+        "Servers for which a given"
+      ]
+    },
+    {
+      "name": "spec-legacy-off",
+      "cmd": "node examples/quote.mjs sources/2026-07-28-streamable-http.md 'HTTP GET or DELETE' 'An `Mcp-Session-Id` header on a request'",
+      "expect": [
+        "HTTP GET or DELETE",
+        "An `Mcp-Session-Id` header on a request"
+      ]
+    },
+    {
+      "name": "spec-resulttype",
+      "cmd": "node examples/quote.mjs sources/2026-07-28-basic.md 'The `result` **MUST** include a `resultType`' 'For backward compatibility with servers implementing earlier'",
+      "expect": [
+        "The `result` **MUST** include a `resultType`",
+        "For backward compatibility with servers implementing earlier"
+      ]
+    },
+    {
+      "name": "spec-session",
+      "cmd": "node examples/quote.mjs sources/2025-11-25-transports.md 'The session ID **SHOULD**' 'The server **MAY** terminate the session' 'The server **MUST NOT** replay' 'A server using the Streamable HTTP transport **MAY** assign' 'If an `MCP-Session-Id` is returned'",
+      "expect": [
+        "The session ID **SHOULD**",
+        "The server **MAY** terminate the session",
+        "The server **MUST NOT** replay",
+        "A server using the Streamable HTTP transport **MAY** assign",
+        "If an `MCP-Session-Id` is returned"
+      ]
+    },
+    {
+      "name": "spec-sampling",
+      "cmd": "node examples/quote.mjs sources/2025-11-25-sampling.md 'For trust & safety'",
+      "expect": [
+        "For trust & safety"
+      ]
+    },
+    {
+      "name": "spec-origin",
+      "cmd": "node examples/quote.mjs sources/2026-07-28-streamable-http.md 'If the `Origin` header is present and invalid'",
+      "expect": [
+        "If the `Origin` header is present and invalid"
+      ]
+    },
+    {
+      "name": "spec-meta",
+      "cmd": "node examples/quote.mjs sources/2026-07-28-mrtr.md 'Every request **MUST** include' 'Servers **MUST** send server-to-client'",
+      "expect": [
+        "Every request **MUST** include",
+        "Servers **MUST** send server-to-client"
+      ]
+    },
+    {
+      "name": "spec-legacy-get",
+      "cmd": "node examples/quote.mjs sources/2025-11-25-transports.md 'The client **MAY** issue an HTTP GET' 'The server **MAY** send JSON-RPC *requests* and *notifications* on the stream'",
+      "expect": [
+        "The client **MAY** issue an HTTP GET",
+        "The server **MAY** send JSON-RPC *requests* and *notifications* on the stream"
+      ]
+    },
+    {
+      "name": "spec-iss-changelog",
+      "cmd": "node examples/quote.mjs sources/2026-07-28-changelog.md 'Authorization servers **SHOULD** include the `iss`'",
+      "expect": [
+        "Authorization servers **SHOULD** include the `iss`"
+      ]
+    },
+    {
+      "name": "spec-iss",
+      "cmd": "node examples/quote.mjs sources/2026-07-28-authorization.md 'On receiving the authorization response'",
+      "expect": [
+        "On receiving the authorization response"
+      ]
+    },
+    {
+      "name": "spec-deprecation",
+      "cmd": "node examples/quote.mjs sources/2026-07-28-changelog.md 'These features remain fully functional' 'Adopt a specification'",
+      "expect": [
+        "These features remain fully functional",
+        "Adopt a specification"
+      ]
+    },
+    {
+      "name": "spec-token-legacy",
+      "cmd": "node examples/quote.mjs sources/2025-11-25-authorization.md 'Note that authorization **MUST**'",
+      "expect": [
+        "Note that authorization **MUST** be included in every HTTP request"
+      ]
+    },
+    {
+      "name": "spec-token-modern",
+      "cmd": "node examples/quote.mjs sources/2026-07-28-authorization.md 'Note that authorization **MUST**'",
+      "expect": [
+        "Note that authorization **MUST** be included in every HTTP request"
+      ]
+    },
+    {
+      "name": "spec-iss-legacy-absent",
+      "cmd": "grep -c -i -E '\\biss\\b|9207' sources/2025-11-25-authorization.md",
+      "expect": [
+        "0"
+      ]
+    }
+  ]
+}
